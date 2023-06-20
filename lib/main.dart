@@ -34,6 +34,23 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   @override
+  void initState() {
+    initData();
+    super.initState();
+  }
+
+  Future<void> initData() async {
+    List<Map<String, dynamic>> items = await DatabaseHelper.getCounters();
+    if (items.isEmpty) {
+      _counter = 0;
+    } else {
+      Map<String, dynamic> item = items[0];
+      _counter = item['count'];
+    }
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -56,16 +73,31 @@ class _MyHomePageState extends State<MyHomePage> {
                 setState(() {
                   _counter++;
                 });
-                await DatabaseHelper.saveItem(_counter);
+                List<Map<String, dynamic>> items =
+                    await DatabaseHelper.getCounters();
+                if (items.isEmpty) {
+                  await DatabaseHelper.saveCounter(_counter);
+                } else {
+                  await DatabaseHelper.updateCounter(1, _counter);
+                }
+                print(items);
               },
               child: const Text('+'),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_counter > 0) {
                   setState(() {
                     _counter--;
                   });
+                  List<Map<String, dynamic>> items =
+                      await DatabaseHelper.getCounters();
+                  if (items.isEmpty) {
+                    await DatabaseHelper.saveCounter(_counter);
+                  } else {
+                    await DatabaseHelper.updateCounter(1, _counter);
+                  }
+                  print(items);
                 }
               },
               child: const Text('-'),
@@ -76,7 +108,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   _counter = 0;
                 });
                 List<Map<String, dynamic>> items =
-                    await DatabaseHelper.getItems();
+                    await DatabaseHelper.getCounters();
+                if (items.isNotEmpty) {
+                  await DatabaseHelper.updateCounter(1, 0);
+                }
                 print(items);
               },
               child: const Text('reset'),
