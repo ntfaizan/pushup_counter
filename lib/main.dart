@@ -32,6 +32,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  final nameController = TextEditingController();
 
   @override
   void initState() {
@@ -61,6 +62,15 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            TextField(
+              controller: nameController,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                print(nameController.text);
+              },
+              child: const Text('Save'),
+            ),
             const Text(
               'You have pushed the button this many times:',
             ),
